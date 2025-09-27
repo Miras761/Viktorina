@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9-сыныпқа арналған викторина ойыны</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e0f2f7; /* Ашық көк түс */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .quiz-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #007bff; /* Көк түс */
+            margin-bottom: 25px;
+            font-size: 2.2em;
+        }
+
+        .question-text {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+
+        .answer-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background-color: #007bff; /* Көк түс */
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn:hover {
+            background-color: #0056b3; /* Қою көк */
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.correct {
+            background-color: #28a745; /* Жасыл түс */
+        }
+
+        .btn.incorrect {
+            background-color: #dc3545; /* Қызыл түс */
+        }
+
+        .next-btn {
+            background-color: #ffc107; /* Сары түс */
+            color: #333;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            display: none; /* Бастапқыда жасыру */
+        }
+
+        .next-btn:hover {
+            background-color: #e0a800; /* Қою сары */
+        }
+
+        .score-area {
+            font-size: 1.3em;
+            margin-top: 25px;
+            color: #4a4a4a;
+        }
+
+        .feedback {
+            font-size: 1.2em;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            color: #28a745; /* Жасыл */
+        }
+
+        .feedback.incorrect {
+            color: #dc3545; /* Қызыл */
+        }
+
+        /* Адаптивті дизайн */
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .question-text {
+                font-size: 1.2em;
+            }
+            .btn {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>9-сыныпқа арналған викторина</h1>
+        <div id="question" class="question-text">Сұрақ осында көрсетіледі</div>
+        <div id="answer-buttons" class="answer-buttons">
+            <!-- Жауаптардың түймелері осында қосылады -->
+        </div>
+        <button id="next-btn" class="next-btn">Келесі сұрақ</button>
+        <div id="feedback" class="feedback"></div>
+        <div id="score" class="score-area">Ұпай: 0</div>
+    </div>
+
+    <script>
+        // Сұрақтар массиві
+        const questions = [
+            {
+                question: "Қазақстанның астанасы қазіргі уақытта қалай аталады?",
+                answers: [
+                    { text: "Алматы", correct: false },
+                    { text: "Астана", correct: true },
+                    { text: "Шымкент", correct: false },
+                    { text: "Ақмола", correct: false }
+                ]
+            },
+            {
+                question: "Судың химиялық формуласы қандай?",
+                answers: [
+                    { text: "CO2", correct: false },
+                    { text: "O2", correct: false },
+                    { text: "H2O", correct: true },
+                    { text: "NaCl", correct: false }
+                ]
+            },
+            {
+                question: "Абай Құнанбаевтың шын аты кім?",
+                answers: [
+                    { text: "Ибраһим", correct: true },
+                    { text: "Әбілқайыр", correct: false },
+                    { text: "Құнанбай", correct: false },
+                    { text: "Тұрағұл", correct: false }
+                ]
+            },
+            {
+                question: "Күштің өлшем бірлігі не?",
+                answers: [
+                    { text: "Ватт", correct: false },
+                    { text: "Джоуль", correct: false },
+                    { text: "Ньютон", correct: true },
+                    { text: "Паскаль", correct: false }
+                ]
+            },
+            {
+                question: "Қазақстанның мемлекеттік тілі қай тіл?",
+                answers: [
+                    { text: "Орыс тілі", correct: false },
+                    { text: "Ағылшын тілі", correct: false },
+                    { text: "Қазақ тілі", correct: true },
+                    { text: "Түрік тілі", correct: false }
+                ]
+            },
+            {
+                question: "Фотосинтез процесі қайда жүреді?",
+                answers: [
+                    { text: "Жануарларда", correct: false },
+                    { text: "Өсімдіктерде", correct: true },
+                    { text: "Саңырауқұлақтарда", correct: false },
+                    { text: "Адам ағзасында", correct: false }
+                ]
+            }
+        ];
+
+        const questionElement = document.getElementById("question");
+        const answerButtons = document.getElementById("answer-buttons");
+        const nextButton = document.getElementById("next-btn");
+        const feedbackElement = document.getElementById("feedback");
+        const scoreElement = document.getElementById("score");
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            nextButton.innerHTML = "Келесі сұрақ";
+            nextButton.style.display = "none";
+            feedbackElement.textContent = "";
+            scoreElement.textContent = `Ұпай: ${score}`;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            resetState();
+            let currentQuestion = questions[currentQuestionIndex];
+            let questionNo = currentQuestionIndex + 1;
+            questionElement.innerHTML = `${questionNo}. ${currentQuestion.question}`;
+
+            currentQuestion.answers.forEach(answer => {
+                const button = document.createElement("button");
+                button.innerHTML = answer.text;
+                button.classList.add("btn");
+                answerButtons.appendChild(button);
+                if (answer.correct) {
+                    button.dataset.correct = answer.correct;
+                }
+                button.addEventListener("click", selectAnswer);
+            });
+        }
+
+        function resetState() {
+            nextButton.style.display = "none";
+            feedbackElement.textContent = "";
+            while (answerButtons.firstChild) {
+                answerButtons.removeChild(answerButtons.firstChild);
+            }
+        }
+
+        function selectAnswer(e) {
+            const selectedBtn = e.target;
+            const isCorrect = selectedBtn.dataset.correct === "true";
+
+            // Барлық түймелерді өшіру
+            Array.from(answerButtons.children).forEach(button => {
+                button.disabled = true;
+                if (button.dataset.correct === "true") {
+                    button.classList.add("correct");
+                } else {
+                    button.classList.add("incorrect"); // Қате жауаптарды да көрсету
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                feedbackElement.textContent = "Дұрыс жауап!";
+                feedbackElement.className = "feedback correct";
+            } else {
+                feedbackElement.textContent = "Қате жауап!";
+                feedbackElement.className = "feedback incorrect";
+            }
+            scoreElement.textContent = `Ұпай: ${score}`;
+
+            nextButton.style.display = "block";
+        }
+
+        function handleNextButton() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showScore();
+            }
+        }
+
+        function showScore() {
+            resetState();
+            questionElement.innerHTML = `Викторина аяқталды! Сіз ${questions.length} сұрақтың ішінен ${score} ұпай жинадыңыз.`;
+            nextButton.innerHTML = "Қайта бастау";
+            nextButton.style.display = "block";
+            feedbackElement.textContent = "";
+            scoreElement.textContent = `Соңғы ұпай: ${score}/${questions.length}`;
+        }
+
+        nextButton.addEventListener("click", () => {
+            if (currentQuestionIndex < questions.length) {
+                handleNextButton();
+            } else {
+                startQuiz();
+            }
+        });
+
+        startQuiz(); // Ойынды бастау
+    </script>
+</body>
+</html>
